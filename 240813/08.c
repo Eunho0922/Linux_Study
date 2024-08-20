@@ -16,6 +16,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	while((nread = read(fd, buffer, 1024)) > 0) {
+		printf("before: %s\n", buffer);
 		for(count = 0; count < nread; count++) {
 			if(buffer[count] >= 'a' && buffer[count] <= 'z')
 				buffer[count] = buffer[count] -'a' + 'A';
@@ -23,6 +24,8 @@ int main(int argc, char *argv[]) {
 		lseek(fd, (off_t)-nread, SEEK_CUR);
 		if(write(fd, buffer, nread) < nread) close(fd);
 	}
+
+	printf("after: %s\n", buffer);
 
 	close(fd);
 }
