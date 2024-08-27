@@ -3,29 +3,38 @@
 #include <dirent.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 
 int main(int argc, char **argv) {
-	DIR *dirp;
-	struct dirent *dentry;
+    DIR *dirp;
+    struct dirent *dentry;
 
-	int file_count, dir_count = 0;
+    int file_count = 0, dir_count = 0;
+    char path[1024];
 
-	if((dirp = opendir(argv[1])) == NULL )
-		exit(1);
+    if((dirp = opendir(argv[1])) == NULL)
+        exit(1);
 
-	while((dentry = readdir(dirp)) )
-	{
-		if(dentry->d_ino != 0) {
-			if(dentry->d_type == DT_REG) {
-                file_count += 1;
-            } else if(dentry->d_type == DT_DIR) {
-				 dir_count += 1;
-            }
-		}
-	}
+    while((dentry = readdir(dirp)) ) {
 
-	printf("FILE : %d\n", file_count);
-	printf("DIRECTIRY : %d\n",dir_count);
 
-	closedir(dirp);
+        strcpy(path, argv[1]);
+        strcat(path, "/");
+        strcat(path, dentry->d_name);
+
+        DIR *subdir = opendir(path);
+        if (subdir != NULL) {
+            dir_count++;
+            closedir(subdir);
+        } else {
+            file_count++;
+        }
+    }
+
+    printf("FILE : %d\n", file_count);
+    printf("DIRECTORY : %d\n", dir_count);
+
+    closedir(dirp);
+    return 0;
 }
+
